@@ -2,7 +2,9 @@ import yfinance as yf
 from yfinance import Ticker
 
 #SET UP TRACKER HERE:
-
+def tracker():
+    price = float(input("TRACKING AGAINST:  "))
+    return price
 
 def fiveback(symbol):
     ticker = yf.Ticker(symbol)
@@ -18,18 +20,20 @@ def nownow(symbol):
     #print(data)
     return data
 
-def color(symbol):
-    if nownow(symbol) > fiveback(symbol):
+def color(symbol, price):
+    if nownow(symbol) > price:
         return "green"
     else:
         return "red"
 
 def combine(name, symbol):
     print(name,": ")
+    print("five days ago close")
     print(fiveback(symbol))
+    print("latest price")
     print(nownow(symbol))
     print()
-    print(color(symbol))
+    print(color(symbol, tracker()))
     print()
     print()
 
