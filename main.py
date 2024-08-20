@@ -2,6 +2,7 @@ import yfinance as yf
 from yfinance import Ticker
 import time
 from threading import Timer
+import tkinter as tk
 
 # Store prices for different symbols
 tracked_data = {
@@ -61,7 +62,9 @@ def program():
             print("Exiting now...")
             global on
             on = False
-    print("Refreshing...")
+            break
+        else:
+            print("Refreshing...")
 
 
 ##go, be free
