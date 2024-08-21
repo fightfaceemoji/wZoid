@@ -6,9 +6,11 @@ import tkinter as tk
 
 # Store prices for different symbols
 tracked_data = {
-    'TSLA': {'name': 'Tesla', 'price': 2.0},
-    '^GSPC': {'name': 'S&P 500', 'price': 4500.0},
-    'EUR=X': {'name': 'USD to EUR', 'price': 0.85}
+    'TSLA': {'name': 'Tesla', 'price': 221.1},
+    '^GSPC': {'name': 'S&P 500', 'price': 5597.12},
+    'EUR=X': {'name': 'USD to EUR', 'price': 0.8988},
+    'BRK-B': { 'name':'Berkshire B', 'price': 448.00},
+    'AAPL':{'name':'Apple','price':226.51}
 }
 
 ##variables
