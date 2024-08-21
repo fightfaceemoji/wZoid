@@ -54,43 +54,6 @@ def combine(symbol, name):
     print()
     print()
 
-##SUPER IMPORTANT
-def refresh():
-    if on:
-        for symbol in tracked_data.keys():
-            #combine(symbol, tracked_data[symbol]['name'])
-            tracked_data[symbol]['color'] = color(symbol)
-        Timer(30, refresh).start()
-
-##a relic, not called
-def program():
-    refresh()
-    global user_input
-    while user_input != 'x':
-        user_input = input("Enter 'X' to exit at any time.").strip().lower()
-        if user_input == 'x':
-            print("Exiting now...")
-            global on
-            on = False
-            break
-        else:
-            print("Refreshing...")
-
-def fresh_gui():
-    refresh()
-    for i, symbol in enumerate(tracked_data.keys()):
-        set_price(symbol,price_entries[i].get())
-        set_target(symbol,target_entries[i].get())
-        refresh()
-        data = tracked_data[symbol]
-        name_label = name_labels[i]
-        symbol_label = symbol_labels[i]
-        color_box = color_boxes[i]
-        name_label.config(text=data['name'])
-        symbol_label.config(text=symbol)
-        color_box.config(bg=data['color'])
-
-
 def stop_program():
     global on
     on = False
@@ -130,38 +93,68 @@ color_boxes = []
 price_entries = []
 target_entries = []
 
-tk.Label(root, text='Bought at:').grid(row=0, column=3)
-tk.Label(root, text='Sell Target: ').grid(row=0, column=4)
+class App(tk.Frame):
 
-for i, symbol in enumerate(tracked_data.keys(), start=1):
-    ## CREATE LABEL BOXES
-    tk.Label(root, text=tracked_data[symbol]['name']).grid(row=i, column=0)
-    tk.Label(root, text=symbol).grid(row=i, column=1)
-    color_box = tk.Label(root, width=10, height=2, relief="solid")
-    color_box.grid(row=i, column=2)
+    def __init__(self, master=None):
+        tk.Frame.__init__(self, master)
+        tk.Label(root, text='Bought at:').grid(row=0, column=3)
+        tk.Label(root, text='Sell Target: ').grid(row=0, column=4)
 
-    # Create an Entry widget and store it in the list
-    price_entry = tk.Entry(root)
-    price_entry.grid(row=i, column=3)
-    price_entry.insert(0, tracked_data[symbol]['price'])
-    price_entries.append(price_entry)
+        for i, symbol in enumerate(tracked_data.keys(), start=1):
+            ## CREATE LABEL BOXES
+            tk.Label(root, text=tracked_data[symbol]['name']).grid(row=i, column=0)
+            tk.Label(root, text=symbol).grid(row=i, column=1)
+            color_box = tk.Label(root, width=10, height=2, relief="solid")
+            color_box.grid(row=i, column=2)
 
-    target_entry = tk.Entry(root)
-    target_entry.grid(row=i, column=4)
-    target_entry.insert(0, tracked_data[symbol]['target'])
-    target_entries.append(target_entry)
+            # Create an Entry widget and store it in the list
+            price_entry = tk.Entry(root)
+            price_entry.grid(row=i, column=3)
+            price_entry.insert(0, tracked_data[symbol]['price'])
+            price_entries.append(price_entry)
 
+            target_entry = tk.Entry(root)
+            target_entry.grid(row=i, column=4)
+            target_entry.insert(0, tracked_data[symbol]['target'])
+            target_entries.append(target_entry)
 
-    name_labels.append(tk.Label(root))
-    symbol_labels.append(tk.Label(root))
-    color_boxes.append(color_box)
+            name_labels.append(tk.Label(root))
+            symbol_labels.append(tk.Label(root))
+            color_boxes.append(color_box)
 
-# Add a button to exit the program
-exit_button = tk.Button(root, text="Exit", command=stop_program)
-exit_button.grid(row=len(tracked_data)+1, column =  1)
-refresh_button = tk.Button(root, text="Refresh", command=lambda: fresh_gui())
-refresh_button.grid(row=len(tracked_data)+1, column=3)
+        self.fresh_gui()
+        # Add a button to exit the program
+        exit_button = tk.Button(root, text="Exit", command=stop_program)
+        exit_button.grid(row=len(tracked_data) + 1, column=1)
+        refresh_button = tk.Button(root, text="Refresh", command=self.fresh_gui)
+        refresh_button.grid(row=len(tracked_data) + 1, column=3, columnspan=2)
+
+        self.refresh()
+
+    ##SUPER IMPORTANT- has timer
+    def refresh(self):
+        if on:
+            for symbol in tracked_data.keys():
+                # combine(symbol, tracked_data[symbol]['name'])
+                tracked_data[symbol]['color'] = color(symbol)
+            Timer(10, self.refresh).start()
+            print('Refreshing...')
+
+    def fresh_gui(self):
+        self.refresh()
+        for i, symbol in enumerate(tracked_data.keys()):
+            set_price(symbol, price_entries[i].get())
+            set_target(symbol, target_entries[i].get())
+            self.refresh()
+            data = tracked_data[symbol]
+            name_label = name_labels[i]
+            symbol_label = symbol_labels[i]
+            color_box = color_boxes[i]
+            name_label.config(text=data['name'])
+            symbol_label.config(text=symbol)
+            color_box.config(bg=data['color'])
+
 
 ##go, be free
-fresh_gui()
+app=App(master=root)
 root.mainloop()
