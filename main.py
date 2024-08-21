@@ -6,11 +6,11 @@ import tkinter as tk
 
 # Store prices for different symbols
 tracked_data = {
-    'TSLA': {'name': 'Tesla', 'price': 221.1},
-    '^GSPC': {'name': 'S&P 500', 'price': 5597.12},
-    'EUR=X': {'name': 'USD to EUR', 'price': 0.8988},
-    'BRK-B': { 'name':'Berkshire B', 'price': 448.00},
-    'AAPL':{'name':'Apple','price':226.51}
+    'TSLA': {'name': 'Tesla', 'price': 221.1, 'target':225},
+    '^GSPC': {'name': 'S&P 500', 'price': 5597.12, 'target':5650},
+    'EUR=X': {'name': 'USD to EUR', 'price': 0.8988, 'target':0.95},
+    'BRK-B': { 'name':'Berkshire B', 'price': 448.00, 'target':455},
+    'AAPL':{'name':'Apple','price':226.51, 'target':230}
 }
 
 ##variables
@@ -35,7 +35,9 @@ def nownow(symbol):
 
 #color code based on comparison
 def color(symbol):
-    if nownow(symbol) > tracked_data[symbol]['price']:
+    if nownow(symbol) > tracked_data[symbol]['target']:
+        return "purple"
+    elif nownow(symbol) > tracked_data[symbol]['price']:
         return "green"
     else:
         return "red"
