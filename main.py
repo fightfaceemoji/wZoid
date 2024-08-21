@@ -80,6 +80,7 @@ def fresh_gui():
     refresh()
     for i, symbol in enumerate(tracked_data.keys()):
         set_price(symbol,price_entries[i].get())
+        set_target(symbol,target_entries[i].get())
         refresh()
         data = tracked_data[symbol]
         name_label = name_labels[i]
@@ -106,6 +107,17 @@ def set_price(symbol, new_price):
             print(f"Error: Symbol {symbol} not found!")
     except ValueError:
         print("Error: Please enter a valid number for the price.")
+
+def set_target(symbol, new_target):
+    try:
+        new_target = float(new_target)
+        if symbol in tracked_data:
+            tracked_data[symbol]['target'] = new_target
+            print(f"Success: Updated target {tracked_data[symbol]['name']} to {new_target}")
+        else:
+            print(f"Error: Symbol {symbol} not found!")
+    except ValueError:
+        print("Error: Please enter a valid number for the target.")
 
 # Create the main window
 root = tk.Tk()
