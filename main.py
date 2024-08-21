@@ -116,8 +116,10 @@ name_labels = []
 symbol_labels = []
 color_boxes = []
 price_entries = []
+target_entries = []
 
 tk.Label(root, text='Bought at:').grid(row=0, column=3)
+tk.Label(root, text='Sell Target: ').grid(row=0, column=4)
 
 for i, symbol in enumerate(tracked_data.keys(), start=1):
     ## CREATE LABEL BOXES
@@ -131,6 +133,12 @@ for i, symbol in enumerate(tracked_data.keys(), start=1):
     price_entry.grid(row=i, column=3)
     price_entry.insert(0, tracked_data[symbol]['price'])
     price_entries.append(price_entry)
+
+    target_entry = tk.Entry(root)
+    target_entry.grid(row=i, column=4)
+    target_entry.insert(0, tracked_data[symbol]['target'])
+    target_entries.append(target_entry)
+
 
     name_labels.append(tk.Label(root))
     symbol_labels.append(tk.Label(root))
