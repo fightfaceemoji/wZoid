@@ -115,7 +115,10 @@ symbol_labels = []
 color_boxes = []
 price_entries = []
 
-for i, symbol in enumerate(tracked_data.keys()):
+tk.Label(root, text='Bought at:').grid(row=0, column=3)
+
+for i, symbol in enumerate(tracked_data.keys(), start=1):
+    ## CREATE LABEL BOXES
     tk.Label(root, text=tracked_data[symbol]['name']).grid(row=i, column=0)
     tk.Label(root, text=symbol).grid(row=i, column=1)
     color_box = tk.Label(root, width=10, height=2, relief="solid")
@@ -133,9 +136,9 @@ for i, symbol in enumerate(tracked_data.keys()):
 
 # Add a button to exit the program
 exit_button = tk.Button(root, text="Exit", command=stop_program)
-exit_button.grid(row=len(tracked_data), column =  1)
+exit_button.grid(row=len(tracked_data)+1, column =  1)
 refresh_button = tk.Button(root, text="Refresh", command=lambda: fresh_gui())
-refresh_button.grid(row=len(tracked_data), column=3)
+refresh_button.grid(row=len(tracked_data)+1, column=3)
 
 ##go, be free
 fresh_gui()
