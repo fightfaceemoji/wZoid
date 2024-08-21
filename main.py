@@ -52,6 +52,7 @@ def combine(symbol, name):
     print()
     print()
 
+##SUPER IMPORTANT
 def refresh():
     if on:
         for symbol in tracked_data.keys():
@@ -59,6 +60,7 @@ def refresh():
             tracked_data[symbol]['color'] = color(symbol)
         Timer(30, refresh).start()
 
+##a relic, not called
 def program():
     refresh()
     global user_input
@@ -90,6 +92,7 @@ def stop_program():
     global on
     on = False
     root.destroy()
+    exit()
 
 def set_price(symbol, new_price):
     try:
@@ -121,6 +124,7 @@ for i, symbol in enumerate(tracked_data.keys()):
     # Create an Entry widget and store it in the list
     price_entry = tk.Entry(root)
     price_entry.grid(row=i, column=3)
+    price_entry.insert(0, tracked_data[symbol]['price'])
     price_entries.append(price_entry)
 
     name_labels.append(tk.Label(root))
@@ -129,7 +133,7 @@ for i, symbol in enumerate(tracked_data.keys()):
 
 # Add a button to exit the program
 exit_button = tk.Button(root, text="Exit", command=stop_program)
-exit_button.grid(row=len(tracked_data), column = 1)
+exit_button.grid(row=len(tracked_data), column =  1)
 refresh_button = tk.Button(root, text="Refresh", command=lambda: fresh_gui())
 refresh_button.grid(row=len(tracked_data), column=3)
 
