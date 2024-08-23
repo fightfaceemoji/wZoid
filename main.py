@@ -16,36 +16,54 @@ tracked_data = {
 ##variables
 on = True
 
-
-## this finds the close from five days ago
-def fiveback(symbol):
-    ticker = yf.Ticker(symbol)
-    data = ticker.history(period='5d', interval='1d')
-    #print(data)
-    close = data['Close'].iloc[0]
-    #print(close)
-    return close
-
-
-
-def stop_program():
-    global on
-    on = False
-    root.destroy()
-    exit()
-
-
-
 # Create the main window
 root = tk.Tk()
 root.title("Stock Tracker")
 
-# Create and place widgets
+# widget storage
 name_labels = []
 symbol_labels = []
 color_boxes = []
 price_entries = []
 target_entries = []
+
+
+def set_target(symbol, new_target):
+    try:
+        new_target = float(new_target)
+        if symbol in tracked_data:
+            tracked_data[symbol]['target'] = new_target
+            print(f"Success: Updated target {tracked_data[symbol]['name']} to {new_target}")
+        else:
+            print(f"Error: Symbol {symbol} not found!")
+    except ValueError:
+        print("Error: Please enter a valid number for the target.")
+
+
+def set_price(symbol, new_price):
+    try:
+        new_price = float(new_price)
+        if symbol in tracked_data:
+            tracked_data[symbol]['price'] = new_price
+            print(f"Success: Updated {tracked_data[symbol]['name']} to {new_price}")
+        else:
+            print(f"Error: Symbol {symbol} not found!")
+    except ValueError:
+        print("Error: Please enter a valid number for the price.")
+
+
+def fresh_gui():
+    # Refresh the data and update the GUI elements
+    for i, symbol in enumerate(tracked_data.keys()):
+        set_price(symbol, price_entries[i].get())
+        set_target(symbol, target_entries[i].get())  # Corrected here to use target_entries
+        data = tracked_data[symbol]
+        name_label = name_labels[i]
+        symbol_label = symbol_labels[i]
+        color_box = color_boxes[i]
+        name_label.config(text=data['name'])
+        symbol_label.config(text=symbol)
+        color_box.config(bg=data['color'])
 
 
 class App(tk.Frame):
@@ -77,59 +95,23 @@ class App(tk.Frame):
             symbol_labels.append(tk.Label(root))
             color_boxes.append(color_box)
 
-        self.fresh_gui()
         # Add a button to exit the program
-        exit_button = tk.Button(root, text="Exit", command=stop_program)
+        exit_button = tk.Button(root, text="Exit", command=self.stop_program)
         exit_button.grid(row=len(tracked_data) + 1, column=1)
-        refresh_button = tk.Button(root, text="Refresh", command=self.fresh_gui)
+        refresh_button = tk.Button(root, text="Refresh", command=fresh_gui)
         refresh_button.grid(row=len(tracked_data) + 1, column=3, columnspan=2)
 
-        self.fresh_gui()
-
-    def set_price(self, symbol, new_price):
-        try:
-            new_price = float(new_price)
-            if symbol in tracked_data:
-                tracked_data[symbol]['price'] = new_price
-                print(f"Success: Updated {tracked_data[symbol]['name']} to {new_price}")
-            else:
-                print(f"Error: Symbol {symbol} not found!")
-        except ValueError:
-            print("Error: Please enter a valid number for the price.")
-
-    def set_target(self, symbol, new_target):
-        try:
-            new_target = float(new_target)
-            if symbol in tracked_data:
-                tracked_data[symbol]['target'] = new_target
-                print(f"Success: Updated target {tracked_data[symbol]['name']} to {new_target}")
-            else:
-                print(f"Error: Symbol {symbol} not found!")
-        except ValueError:
-            print("Error: Please enter a valid number for the target.")
+        self.refresh()  # Initial call to populate colors based on initial prices
 
     ##SUPER IMPORTANT--- has timer
     def refresh(self):
+        global on
         if on:
             for symbol in tracked_data.keys():
-                # combine(symbol, tracked_data[symbol]['name'])
+                # Update color based on current price
                 tracked_data[symbol]['color'] = self.color(symbol)
-            Timer(10, self.refresh).start()
-            print('Refreshing...')
 
-    def fresh_gui(self):
-        self.refresh()
-        for i, symbol in enumerate(tracked_data.keys()):
-            self.set_price(symbol, price_entries[i].get())
-            self.set_target(symbol, price_entries[i].get())
-            self.refresh()
-            data = tracked_data[symbol]
-            name_label = name_labels[i]
-            symbol_label = symbol_labels[i]
-            color_box = color_boxes[i]
-            name_label.config(text=data['name'])
-            symbol_label.config(text=symbol)
-            color_box.config(bg=data['color'])
+            Timer(10, self.refresh).start()  # Continue refreshing every 10 seconds
 
     ## the most recent price pulled
     def nownow(self, symbol):
@@ -140,24 +122,19 @@ class App(tk.Frame):
 
     # color code based on comparison
     def color(self, symbol):
-        if self.nownow(symbol) > tracked_data[symbol]['target']:
+        current_price = self.nownow(symbol)
+        if current_price > tracked_data[symbol]['target']:
             return "purple"
-        elif self.nownow(symbol) > tracked_data[symbol]['price']:
+        elif current_price > tracked_data[symbol]['price']:
             return "green"
         else:
             return "red"
 
-    ## this function just combines the functions for the prints, its mostly for checking run
-    def combine(self, symbol, name):
-        print(name, ": ")
-        print("five days ago close")
-        print(fiveback(symbol))
-        print("latest price")
-        print(self.ownow(symbol))
-        print()
-        print(self.color(symbol))
-        print()
-        print()
+    def stop_program(self):
+        global on
+        on = False
+        self.master.destroy()
+        exit()
 
 
 ##go, be free
