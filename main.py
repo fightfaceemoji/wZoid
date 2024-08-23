@@ -1,6 +1,4 @@
 import yfinance as yf
-from yfinance import Ticker
-import time
 from threading import Timer
 import tkinter as tk
 
@@ -71,6 +69,14 @@ def color(symbol):
         return "red"
 
 
+def refresh():
+    ##SUPER IMPORTANT--- has color update
+    global on
+    if on:
+        for symbol in tracked_data.keys():
+            # Update color based on current price
+            tracked_data[symbol]['color'] = color(symbol)
+
 
 class App(tk.Frame):
 
@@ -109,16 +115,8 @@ class App(tk.Frame):
 
         self.fresh_gui()  # Initial call to populate colors based on initial prices
 
-    ##SUPER IMPORTANT--- has color update
-    def refresh(self):
-        global on
-        if on:
-            for symbol in tracked_data.keys():
-                # Update color based on current price
-                tracked_data[symbol]['color'] = color(symbol)
-
     def fresh_gui(self):
-        self.refresh()
+        refresh()
         # Refresh the data and update the GUI elements
         for i, symbol in enumerate(tracked_data.keys()):
             set_price(symbol, price_entries[i].get())
@@ -131,7 +129,7 @@ class App(tk.Frame):
             symbol_label.config(text=symbol)
             color_box.config(bg=data['color'])
 
-        Timer(10, self.fresh_gui).start()  # Continue refreshing every 10 seconds
+        Timer(900, self.fresh_gui).start()  # Continue refreshing every 10 seconds
 
     def stop_program(self):
         global on
