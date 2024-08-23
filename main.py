@@ -104,7 +104,7 @@ class App(tk.Frame):
         # Add a button to exit the program
         exit_button = tk.Button(root, text="Exit", command=self.stop_program)
         exit_button.grid(row=len(tracked_data) + 1, column=1)
-        refresh_button = tk.Button(root, text="Refresh", command=fresh_gui)
+        refresh_button = tk.Button(root, text="Refresh", command=self.fresh_gui)
         refresh_button.grid(row=len(tracked_data) + 1, column=3, columnspan=2)
 
         self.fresh_gui()  # Initial call to populate colors based on initial prices
@@ -120,6 +120,7 @@ class App(tk.Frame):
                 Timer(10, self.refresh).start()  # Continue refreshing every 10 seconds
 
     def fresh_gui(self):
+        self.refresh()
         # Refresh the data and update the GUI elements
         for i, symbol in enumerate(tracked_data.keys()):
             set_price(symbol, price_entries[i].get())
@@ -131,7 +132,6 @@ class App(tk.Frame):
             name_label.config(text=data['name'])
             symbol_label.config(text=symbol)
             color_box.config(bg=data['color'])
-        self.refresh()
 
     def stop_program(self):
         global on
