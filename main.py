@@ -109,15 +109,13 @@ class App(tk.Frame):
 
         self.fresh_gui()  # Initial call to populate colors based on initial prices
 
-    ##SUPER IMPORTANT--- has timer
+    ##SUPER IMPORTANT--- has color update
     def refresh(self):
         global on
         if on:
             for symbol in tracked_data.keys():
                 # Update color based on current price
                 tracked_data[symbol]['color'] = color(symbol)
-
-                Timer(10, self.refresh).start()  # Continue refreshing every 10 seconds
 
     def fresh_gui(self):
         self.refresh()
@@ -132,6 +130,8 @@ class App(tk.Frame):
             name_label.config(text=data['name'])
             symbol_label.config(text=symbol)
             color_box.config(bg=data['color'])
+
+        Timer(10, self.fresh_gui).start()  # Continue refreshing every 10 seconds
 
     def stop_program(self):
         global on
