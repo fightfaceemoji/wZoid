@@ -52,18 +52,24 @@ def set_price(symbol, new_price):
         print("Error: Please enter a valid number for the price.")
 
 
-def fresh_gui():
-    # Refresh the data and update the GUI elements
-    for i, symbol in enumerate(tracked_data.keys()):
-        set_price(symbol, price_entries[i].get())
-        set_target(symbol, target_entries[i].get())  # Corrected here to use target_entries
-        data = tracked_data[symbol]
-        name_label = name_labels[i]
-        symbol_label = symbol_labels[i]
-        color_box = color_boxes[i]
-        name_label.config(text=data['name'])
-        symbol_label.config(text=symbol)
-        color_box.config(bg=data['color'])
+def nownow(symbol):
+#takes the most recent prices
+    ticker = yf.Ticker(symbol)
+    data = ticker.fast_info.last_price
+    # print(data)
+    return data
+
+
+def color(symbol):
+    # color code based on comparison
+    current_price = nownow(symbol)
+    if current_price > tracked_data[symbol]['target']:
+        return "purple"
+    elif current_price > tracked_data[symbol]['price']:
+        return "green"
+    else:
+        return "red"
+
 
 
 class App(tk.Frame):
@@ -101,7 +107,7 @@ class App(tk.Frame):
         refresh_button = tk.Button(root, text="Refresh", command=fresh_gui)
         refresh_button.grid(row=len(tracked_data) + 1, column=3, columnspan=2)
 
-        self.refresh()  # Initial call to populate colors based on initial prices
+        self.fresh_gui()  # Initial call to populate colors based on initial prices
 
     ##SUPER IMPORTANT--- has timer
     def refresh(self):
@@ -109,26 +115,23 @@ class App(tk.Frame):
         if on:
             for symbol in tracked_data.keys():
                 # Update color based on current price
-                tracked_data[symbol]['color'] = self.color(symbol)
+                tracked_data[symbol]['color'] = color(symbol)
 
-            Timer(10, self.refresh).start()  # Continue refreshing every 10 seconds
+                Timer(10, self.refresh).start()  # Continue refreshing every 10 seconds
 
-    ## the most recent price pulled
-    def nownow(self, symbol):
-        ticker = yf.Ticker(symbol)
-        data = ticker.fast_info.last_price
-        # print(data)
-        return data
-
-    # color code based on comparison
-    def color(self, symbol):
-        current_price = self.nownow(symbol)
-        if current_price > tracked_data[symbol]['target']:
-            return "purple"
-        elif current_price > tracked_data[symbol]['price']:
-            return "green"
-        else:
-            return "red"
+    def fresh_gui(self):
+        # Refresh the data and update the GUI elements
+        for i, symbol in enumerate(tracked_data.keys()):
+            set_price(symbol, price_entries[i].get())
+            set_target(symbol, target_entries[i].get())  # Corrected here to use target_entries
+            data = tracked_data[symbol]
+            name_label = name_labels[i]
+            symbol_label = symbol_labels[i]
+            color_box = color_boxes[i]
+            name_label.config(text=data['name'])
+            symbol_label.config(text=symbol)
+            color_box.config(bg=data['color'])
+        self.refresh()
 
     def stop_program(self):
         global on
