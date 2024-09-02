@@ -4,11 +4,11 @@ import tkinter as tk
 
 # Store prices for different symbols
 tracked_data = {
-    'TSLA': {'name': 'Tesla', 'price': 221.1, 'target': 225},
-    '^GSPC': {'name': 'S&P 500', 'price': 5597.12, 'target': 5650},
-    'EUR=X': {'name': 'USD to EUR', 'price': 0.8988, 'target': 0.95},
-    'BRK-B': {'name': 'Berkshire B', 'price': 448.00, 'target': 455},
-    'AAPL': {'name': 'Apple', 'price': 226.51, 'target': 230}
+    'TSLA': {'name': 'Tesla', 'price': 221.1, 'lowtarget': 225, 'hightarget': 230},
+    '^GSPC': {'name': 'S&P 500', 'price': 5597.12, 'lowtarget': 5650, 'hightarget': 230},
+    'EUR=X': {'name': 'USD to EUR', 'price': 0.8988, 'lowtarget': 0.95, 'hightarget': 230},
+    'BRK-B': {'name': 'Berkshire B', 'price': 448.00, 'lowtarget': 455, 'hightarget': 230},
+    'AAPL': {'name': 'Apple', 'price': 226.51, 'lowtarget': 230, 'hightarget': 230}
 }
 
 ##variables
@@ -23,19 +23,32 @@ name_labels = []
 symbol_labels = []
 color_boxes = []
 price_entries = []
-target_entries = []
+nownow_prices = []
+lowtarget_entries = []
+hightarget_entries = []
 
 
-def set_target(symbol, new_target):
+def set_lowtarget(symbol, new_lowtarget):
     try:
-        new_target = float(new_target)
+        new_lowtarget = float(new_lowtarget)
         if symbol in tracked_data:
-            tracked_data[symbol]['target'] = new_target
-            print(f"Success: Updated target {tracked_data[symbol]['name']} to {new_target}")
+            tracked_data[symbol]['lowtarget'] = new_lowtarget
+            print(f"Success: Updated target {tracked_data[symbol]['name']} to {new_lowtarget}")
         else:
             print(f"Error: Symbol {symbol} not found!")
     except ValueError:
-        print("Error: Please enter a valid number for the target.")
+        print("Error: Please enter a valid number for the low target.")
+
+def set_hightarget(symbol, new_hightarget):
+    try:
+        new_hightarget = float(new_hightarget)
+        if symbol in tracked_data:
+            tracked_data[symbol]['hightarget'] = new_hightarget
+            print(f"Success: Updated target {tracked_data[symbol]['name']} to {new_hightarget}")
+        else:
+            print(f"Error: Symbol {symbol} not found!")
+    except ValueError:
+        print("Error: Please enter a valid number for the high target.")
 
 
 def set_price(symbol, new_price):
@@ -61,8 +74,10 @@ def nownow(symbol):
 def color(symbol):
     # color code based on comparison
     current_price = nownow(symbol)
-    if current_price > tracked_data[symbol]['target']:
+    if current_price > tracked_data[symbol]['hightarget']:
         return "purple"
+    elif current_price > tracked_data[symbol]['lowtarget']:
+        return "blue"
     elif current_price > tracked_data[symbol]['price']:
         return "green"
     else:
@@ -76,14 +91,16 @@ def refresh():
         for symbol in tracked_data.keys():
             # Update color based on current price
             tracked_data[symbol]['color'] = color(symbol)
-
+            tracked_data[symbol]['nownow'] = nownow(symbol)
 
 class App(tk.Frame):
 
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         tk.Label(root, text='Bought at:').grid(row=0, column=3)
-        tk.Label(root, text='Sell Target: ').grid(row=0, column=4)
+        tk.Label(root, text='Current Price: ').grid(row=0, column=4)
+        tk.Label(root, text='High Target: ').grid(row=0, column=5)
+        tk.Label(root, text='Low Target: ').grid(row=0, column=6)
 
         for i, symbol in enumerate(tracked_data.keys(), start=1):
             ## CREATE LABEL BOXES
@@ -98,20 +115,29 @@ class App(tk.Frame):
             price_entry.insert(0, tracked_data[symbol]['price'])
             price_entries.append(price_entry)
 
-            target_entry = tk.Entry(root)
-            target_entry.grid(row=i, column=4)
-            target_entry.insert(0, tracked_data[symbol]['target'])
-            target_entries.append(target_entry)
+            nownow_price = (tk.Label(root, text=nownow(symbol)))
+            nownow_price.grid(row=i, column=4)
+
+            hightarget_entry = tk.Entry(root)
+            hightarget_entry.grid(row=i, column=5)
+            hightarget_entry.insert(0, tracked_data[symbol]['hightarget'])
+            hightarget_entries.append(hightarget_entry)
+
+            lowtarget_entry = tk.Entry(root)
+            lowtarget_entry.grid(row=i, column=6)
+            lowtarget_entry.insert(0, tracked_data[symbol]['lowtarget'])
+            lowtarget_entries.append(lowtarget_entry)
 
             name_labels.append(tk.Label(root))
             symbol_labels.append(tk.Label(root))
+            nownow_prices.append(nownow_price)
             color_boxes.append(color_box)
 
         # Add a button to exit the program
         exit_button = tk.Button(root, text="Exit", command=self.stop_program)
         exit_button.grid(row=len(tracked_data) + 1, column=1)
         refresh_button = tk.Button(root, text="Refresh", command=self.fresh_gui)
-        refresh_button.grid(row=len(tracked_data) + 1, column=3, columnspan=2)
+        refresh_button.grid(row=len(tracked_data) + 1, column=5, columnspan=2)
 
         self.fresh_gui()  # Initial call to populate colors based on initial prices
 
@@ -120,11 +146,14 @@ class App(tk.Frame):
         # Refresh the data and update the GUI elements
         for i, symbol in enumerate(tracked_data.keys()):
             set_price(symbol, price_entries[i].get())
-            set_target(symbol, target_entries[i].get())  # Corrected here to use target_entries
+            set_hightarget(symbol, hightarget_entries[i].get())
+            set_lowtarget(symbol, lowtarget_entries[i].get())  # Corrected here to use target_entries
             data = tracked_data[symbol]
             name_label = name_labels[i]
             symbol_label = symbol_labels[i]
             color_box = color_boxes[i]
+            nownow_price = nownow_prices[i]
+
             name_label.config(text=data['name'])
             symbol_label.config(text=symbol)
             color_box.config(bg=data['color'])
