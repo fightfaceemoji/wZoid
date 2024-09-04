@@ -1,6 +1,7 @@
 import yfinance as yf
 from threading import Timer
 import tkinter as tk
+from datetime import datetime
 
 # Store prices for different symbols
 tracked_data = {
@@ -71,6 +72,13 @@ def nownow(symbol):
     return data
 
 
+def lasttime():
+    current_datetime = datetime.now()
+    formatted_datetime = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
+
+    return formatted_datetime
+
+
 def color(symbol):
     # color code based on comparison
     current_price = nownow(symbol)
@@ -92,6 +100,8 @@ def refresh():
             # Update color based on current price
             tracked_data[symbol]['color'] = color(symbol)
             tracked_data[symbol]['nownow'] = nownow(symbol)
+            lasttime()
+
 
 class App(tk.Frame):
 
@@ -101,6 +111,9 @@ class App(tk.Frame):
         tk.Label(root, text='Current Price: ').grid(row=0, column=4)
         tk.Label(root, text='High Target: ').grid(row=0, column=5)
         tk.Label(root, text='Low Target: ').grid(row=0, column=6)
+
+        time_label = tk.Label(root, text=lasttime())
+        time_label.grid(row=0, column=0, columnspan=3)
 
         for i, symbol in enumerate(tracked_data.keys(), start=1):
             ## CREATE LABEL BOXES
