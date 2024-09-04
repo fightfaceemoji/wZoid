@@ -1,0 +1,42 @@
+{
+    "TSLA": {
+        "name": "Tesla",
+        "price": 221.1,
+        "lowtarget": 225.0,
+        "hightarget": 230.0,
+        "color": "red",
+        "nownow": 210.6
+    },
+    "^GSPC": {
+        "name": "S&P 500",
+        "price": 5597.12,
+        "lowtarget": 5650.0,
+        "hightarget": 230.0,
+        "color": "purple",
+        "nownow": 5528.9302
+    },
+    "EUR=X": {
+        "name": "USD to EUR",
+        "price": 0.8988,
+        "lowtarget": 0.95,
+        "hightarget": 230.0,
+        "color": "green",
+        "nownow": 0.9044
+    },
+    "BRK-B": {
+        "name": "Berkshire B",
+        "price": 448.0,
+        "lowtarget": 455.0,
+        "hightarget": 230.0,
+        "color": "purple",
+        "nownow": 476.83
+    },
+    "AAPL": {
+        "name": "Apple",
+        "price": 226.51,
+        "lowtarget": 230.0,
+        "hightarget": 230.0,
+        "color": "red",
+        "nownow": 222.77
+    }
+}
