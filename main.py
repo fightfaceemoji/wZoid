@@ -1,10 +1,8 @@
 import yfinance as yf
 from threading import Timer
 import tkinter as tk
-from tkinter import simpledialog
 from datetime import datetime
 import json
-
 
 # Load tracked_data from a JSON file
 def load_tracked_data():
@@ -18,7 +16,6 @@ def load_tracked_data():
         print("Error decoding JSON file.")
         return {}
 
-
 # Save tracked_data to a JSON file
 def save_tracked_data():
     try:
@@ -26,7 +23,6 @@ def save_tracked_data():
             json.dump(tracked_data, file, indent=4)
     except IOError as e:
         print(f"Error saving tracked data: {e}")
-
 
 # Store prices for different symbols
 tracked_data = load_tracked_data()
@@ -48,7 +44,6 @@ nownow_prices = []
 lowtarget_entries = []
 hightarget_entries = []
 
-
 def set_lowtarget(symbol, new_lowtarget):
     try:
         new_lowtarget = float(new_lowtarget)
@@ -59,7 +54,6 @@ def set_lowtarget(symbol, new_lowtarget):
             print(f"Error: Symbol {symbol} not found!")
     except ValueError:
         print("Error: Please enter a valid number for the low target.")
-
 
 def set_hightarget(symbol, new_hightarget):
     try:
@@ -72,7 +66,6 @@ def set_hightarget(symbol, new_hightarget):
     except ValueError:
         print("Error: Please enter a valid number for the high target.")
 
-
 def set_price(symbol, new_price):
     try:
         new_price = float(new_price)
@@ -84,7 +77,6 @@ def set_price(symbol, new_price):
     except ValueError:
         print("Error: Please enter a valid number for the price.")
 
-
 def fetch_price(symbol):
     try:
         ticker = yf.Ticker(symbol)
@@ -94,21 +86,21 @@ def fetch_price(symbol):
         print(f"Error fetching data for {symbol}: {e}")
         return None
 
-
 def nowround(symbol):
     data = fetch_price(symbol)
     if data is not None:
         return round(data, 4)
     return None
 
-
 def lasttime():
     current_datetime = datetime.now()
     formatted_datetime = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
     return formatted_datetime
 
-
 def color(symbol):
+    if symbol not in tracked_data:
+        print(f"Error: Symbol {symbol} not found in tracked_data!")
+        return "gray"  # Return a default color or handle as appropriate
     current_price = fetch_price(symbol)
     if current_price is None:
         return "gray"  # Gray if there's an issue fetching the price
@@ -120,7 +112,6 @@ def color(symbol):
         return "green"
     else:
         return "red"
-
 
 def update_data():
     for i, symbol in enumerate(tracked_data.keys()):
@@ -145,8 +136,7 @@ class App(tk.Frame):
         self.time_label = tk.Label(root, text=lasttime())
         self.time_label.grid(row=0, column=0, columnspan=3)
 
-        for i, symbol in enumerate(tracked_data.keys(), start=1):
-            self.create_symbol_row(i, symbol, tracked_data[symbol])
+        self.update_widgets()
 
         # Add a refresh button
         refresh_button = tk.Button(root, text="Refresh", command=self.refresh)
@@ -161,6 +151,33 @@ class App(tk.Frame):
         exit_button.grid(row=len(tracked_data) + 1, column=1, columnspan=1)
 
         self.refresh()
+
+    def update_widgets(self):
+        for widget in name_labels:
+            widget.destroy()
+        for widget in symbol_labels:
+            widget.destroy()
+        for widget in color_boxes:
+            widget.destroy()
+        for widget in price_entries:
+            widget.destroy()
+        for widget in nownow_prices:
+            widget.destroy()
+        for widget in lowtarget_entries:
+            widget.destroy()
+        for widget in hightarget_entries:
+            widget.destroy()
+
+        name_labels.clear()
+        symbol_labels.clear()
+        color_boxes.clear()
+        price_entries.clear()
+        nownow_prices.clear()
+        lowtarget_entries.clear()
+        hightarget_entries.clear()
+
+        for i, symbol in enumerate(tracked_data.keys(), start=1):
+            self.create_symbol_row(i, symbol, tracked_data[symbol])
 
     def create_symbol_row(self, i, symbol, data):
         tk.Label(root, text=data['name']).grid(row=i, column=0)
@@ -243,7 +260,7 @@ class App(tk.Frame):
                 'price': float(price),
                 'lowtarget': float(lowtarget),
                 'hightarget': float(hightarget),
-                'color': color(symbol),
+                'color': color(symbol),  # Ensure symbol exists in tracked_data
                 'nownow': nowround(symbol)
             }
 
@@ -254,63 +271,29 @@ class App(tk.Frame):
             add_window.destroy()
 
             # Refresh the main window
-            self.refresh()
+            self.update_widgets()
 
         update_button = tk.Button(add_window, text="Update", command=update_and_close)
-        update_button.grid(row=5, column=0, columnspan=2)
+        update_button.grid(row=5, column=1)
 
     def refresh(self):
-        global on
-        if on:
-            for symbol in tracked_data.keys():
-                current_price = fetch_price(symbol)
-                if current_price is not None:
-                    tracked_data[symbol]['nownow'] = round(current_price, 4)
-                    tracked_data[symbol]['color'] = color(symbol)
-            self.update_gui()
-            Timer(refresh_interval, self.refresh).start()  # Continue refreshing every 15 minutes
-
-    def update_gui(self):
-        self.time_label.config(text=lasttime())
-
-        num_symbols = len(tracked_data)
-
-        # Ensure we have the correct number of widgets for the symbols
-        if len(price_entries) != num_symbols:
-            print(f"Mismatch: price_entries length {len(price_entries)}, tracked_data length {num_symbols}")
-        if len(hightarget_entries) != num_symbols:
-            print(f"Mismatch: hightarget_entries length {len(hightarget_entries)}, tracked_data length {num_symbols}")
-        if len(lowtarget_entries) != num_symbols:
-            print(f"Mismatch: lowtarget_entries length {len(lowtarget_entries)}, tracked_data length {num_symbols}")
-        if len(nownow_prices) != num_symbols:
-            print(f"Mismatch: nownow_prices length {len(nownow_prices)}, tracked_data length {num_symbols}")
-        if len(color_boxes) != num_symbols:
-            print(f"Mismatch: color_boxes length {len(color_boxes)}, tracked_data length {num_symbols}")
-
+        # Update GUI with new data
+        self.update_widgets()
         for i, symbol in enumerate(tracked_data.keys()):
-            if i >= len(price_entries) or i >= len(hightarget_entries) or i >= len(lowtarget_entries) or i >= len(
-                    nownow_prices) or i >= len(color_boxes):
-                print(f"Index error: {i} is out of range")
-                break
+            color_boxes[i].config(bg=color(symbol))
+            nownow_prices[i].config(text=nowround(symbol))
 
-            data = tracked_data[symbol]
-            price_entries[i].delete(0, tk.END)
-            price_entries[i].insert(0, data['price'])
-
-            hightarget_entries[i].delete(0, tk.END)
-            hightarget_entries[i].insert(0, data['hightarget'])
-
-            lowtarget_entries[i].delete(0, tk.END)
-            lowtarget_entries[i].insert(0, data['lowtarget'])
-
-            nownow_prices[i].config(text=data['nownow'])
-            color_boxes[i].config(bg=data['color'])
+        # Schedule next update
+        self.schedule_update()
 
     def stop_program(self):
         global on
         on = False
-        save_tracked_data()
-        root.destroy()
+        root.quit()
+
+    def schedule_update(self):
+        if on:
+            Timer(refresh_interval, self.refresh).start()
 
 
 app = App(root)
