@@ -4,9 +4,6 @@ import tkinter as tk
 from datetime import datetime
 import json
 
-from lxml.objectify import NoneElement
-
-
 # Load tracked_data from a JSON file
 def load_tracked_data():
     try:
@@ -83,7 +80,7 @@ def set_price(symbol, new_price):
 def fetch_price(symbol):
     try:
         ticker = yf.Ticker(symbol)
-        data = ticker.fast_info.last_price
+        data = ticker.history(period="1d")['Close'][-1]
         return data
     except Exception as e:
         print(f"Error fetching data for {symbol}: {e}")
@@ -121,14 +118,16 @@ def color(symbol):
         print(f"Debug: Symbol {symbol} not found in tracked_data!")
         return "gray"  # Default to gray if the symbol is not found
 
-
 def update_widgets(self):
     self.time_label.config(text=lasttime())
     for i, symbol in enumerate(tracked_data.keys()):
         data = tracked_data[symbol]
         try:
+            price_entries[i].delete(0, tk.END)  # Clear existing entry
             price_entries[i].insert(0, data['price'])
+            lowtarget_entries[i].delete(0, tk.END)
             lowtarget_entries[i].insert(0, data['lowtarget'])
+            hightarget_entries[i].delete(0, tk.END)
             hightarget_entries[i].insert(0, data['hightarget'])
         except IndexError:
             print(f"Debug: IndexError at {i} for symbol {symbol}")
@@ -137,8 +136,6 @@ def update_widgets(self):
         new_color = color(symbol)
         color_boxes[i].config(bg=new_color)
         nownow_prices[i].config(text=nowround(symbol))
-
-
 
 class App(tk.Frame):
 
@@ -275,7 +272,7 @@ class App(tk.Frame):
                 'name': name,
                 'price': float(price),
                 'lowtarget': float(lowtarget),
-                'hightarget': float(hightarget),
+                'hightarget': float(highttarget),
                 'color': color(symbol),  # Ensure symbol exists in tracked_data
                 'nownow': nowround(symbol)
             }
@@ -310,7 +307,6 @@ class App(tk.Frame):
     def schedule_update(self):
         if on:
             Timer(refresh_interval, self.refresh).start()
-
 
 app = App(root)
 root.mainloop()
