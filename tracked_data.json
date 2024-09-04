@@ -38,21 +38,5 @@
         "hightarget": 230.0,
         "color": "red",
         "nownow": 222.77
-    },
-    "MSFT": {
-        "name": "Microsoft",
-        "price": 400.0,
-        "lowtarget": 350.0,
-        "hightarget": 500.0,
-        "color": "gray",
-        "nownow": 409.44
-    },
-    "NVDA": {
-        "name": "NVIDIA",
-        "price": 200.0,
-        "lowtarget": 100.0,
-        "hightarget": 300.0,
-        "color": "gray",
-        "nownow": 108.0
     }
 }
