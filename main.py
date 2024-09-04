@@ -75,9 +75,8 @@ def nowround(symbol):
     # takes the most recent prices
     ticker = yf.Ticker(symbol)
     data = ticker.fast_info.last_price
-    data = round(data, 4)
-    # print(data)
-    return data
+
+    return round(data, 4)  # Ensures rounding to 4 decimal places
 
 def lasttime():
     current_datetime = datetime.now()
@@ -121,9 +120,9 @@ class App(tk.Frame):
             price_entry.insert(0, tracked_data[symbol]['price'])
             price_entries.append(price_entry)
 
-            nownow_price = tk.Label(root, text=nowround(symbol))
-            nownow_price.grid(row=i, column=4)
-            nownow_prices.append(nownow_price)
+            now_price = tk.Label(root, text=nowround(symbol))
+            now_price.grid(row=i, column=4)
+            nownow_prices.append(now_price)
 
             hightarget_entry = tk.Entry(root)
             hightarget_entry.grid(row=i, column=5)
@@ -141,10 +140,10 @@ class App(tk.Frame):
 
         exit_button = tk.Button(root, text="Exit", command=self.stop_program)
         exit_button.grid(row=len(tracked_data) + 1, column=1)
-        refresh_button = tk.Button(root, text="Refresh", command=self.fresh_gui)
+        refresh_button = tk.Button(root, text="Refresh", command=self.refresh)
         refresh_button.grid(row=len(tracked_data) + 1, column=5, columnspan=2)
 
-        self.fresh_gui()
+        self.refresh()
 
     def refresh(self):
         # Refresh logic moved inside the class
@@ -152,7 +151,7 @@ class App(tk.Frame):
         if on:
             for symbol in tracked_data.keys():
                 tracked_data[symbol]['color'] = color(symbol)
-                tracked_data[symbol]['nownow'] = nownow(symbol)
+                tracked_data[symbol]['nownow'] = nowround(symbol)
             self.update_gui()
             Timer(900, self.refresh).start()  # Continue refreshing every 15 minutes
 
@@ -167,10 +166,6 @@ class App(tk.Frame):
 
             nownow_prices[i].config(text=data['nownow'])
             color_boxes[i].config(bg=data['color'])
-
-    def fresh_gui(self):
-        # Call refresh method to update data and GUI
-        self.refresh()
 
     def stop_program(self):
         global on
