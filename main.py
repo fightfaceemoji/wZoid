@@ -2,15 +2,15 @@ import yfinance as yf
 from threading import Timer
 import tkinter as tk
 from datetime import datetime
+import json
+
+# Load tracked_data from a JSON file
+def load_tracked_data():
+    with open('tracked_data.json', 'r') as file:
+        return json.load(file)
 
 # Store prices for different symbols
-tracked_data = {
-    'TSLA': {'name': 'Tesla', 'price': 221.1, 'lowtarget': 225, 'hightarget': 230},
-    '^GSPC': {'name': 'S&P 500', 'price': 5597.12, 'lowtarget': 5650, 'hightarget': 230},
-    'EUR=X': {'name': 'USD to EUR', 'price': 0.8988, 'lowtarget': 0.95, 'hightarget': 230},
-    'BRK-B': {'name': 'Berkshire B', 'price': 448.00, 'lowtarget': 455, 'hightarget': 230},
-    'AAPL': {'name': 'Apple', 'price': 226.51, 'lowtarget': 230, 'hightarget': 230}
-}
+tracked_data = load_tracked_data()
 
 ##variables
 on = True
