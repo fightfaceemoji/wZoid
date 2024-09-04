@@ -21,7 +21,7 @@
         "lowtarget": 0.95,
         "hightarget": 230.0,
         "color": "green",
-        "nownow": 0.9044
+        "nownow": 0.9049
     },
     "BRK-B": {
         "name": "Berkshire B",
