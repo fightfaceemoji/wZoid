@@ -80,11 +80,13 @@ def set_price(symbol, new_price):
 def fetch_price(symbol):
     try:
         ticker = yf.Ticker(symbol)
-        data = ticker.history(period="1d")['Close'][-1]
-        return data
+        data = ticker.history(period="1d")['Close']
+        # Use iloc to access the last item by position
+        return data.iloc[-1]
     except Exception as e:
         print(f"Error fetching data for {symbol}: {e}")
         return None
+
 
 def nowround(symbol):
     data = fetch_price(symbol)
