@@ -108,11 +108,11 @@ def color(symbol):
     # Get targets from tracked data
     try:
         data = tracked_data[symbol]
-        if current_price > data['hightarget']:
+        if current_price < data['hightarget']:
             return "purple"
         elif current_price > data['lowtarget']:
             return "blue"
-        elif current_price > data['price']:
+        elif current_price < data['price']:
             return "green"
         else:
             return "red"
