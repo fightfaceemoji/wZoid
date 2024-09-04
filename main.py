@@ -4,6 +4,9 @@ import tkinter as tk
 from datetime import datetime
 import json
 
+from lxml.objectify import NoneElement
+
+
 # Load tracked_data from a JSON file
 def load_tracked_data():
     try:
@@ -98,30 +101,43 @@ def lasttime():
     return formatted_datetime
 
 def color(symbol):
-    if symbol not in tracked_data:
-        print(f"Error: Symbol {symbol} not found in tracked_data!")
-        return "gray"  # Return a default color or handle as appropriate
     current_price = fetch_price(symbol)
     if current_price is None:
+        print(f"Debug: Fetching price for {symbol} failed, setting color to gray.")
         return "gray"  # Gray if there's an issue fetching the price
-    if current_price > tracked_data[symbol]['hightarget']:
-        return "purple"
-    elif current_price > tracked_data[symbol]['lowtarget']:
-        return "blue"
-    elif current_price > tracked_data[symbol]['price']:
-        return "green"
-    else:
-        return "red"
 
-def update_data():
+    # Get targets from tracked data
+    try:
+        data = tracked_data[symbol]
+        if current_price > data['hightarget']:
+            return "purple"
+        elif current_price > data['lowtarget']:
+            return "blue"
+        elif current_price > data['price']:
+            return "green"
+        else:
+            return "red"
+    except KeyError:
+        print(f"Debug: Symbol {symbol} not found in tracked_data!")
+        return "gray"  # Default to gray if the symbol is not found
+
+
+def update_widgets(self):
+    self.time_label.config(text=lasttime())
     for i, symbol in enumerate(tracked_data.keys()):
-        new_price = float(price_entries[i].get())
-        new_lowtarget = float(lowtarget_entries[i].get())
-        new_hightarget = float(hightarget_entries[i].get())
-        tracked_data[symbol]['price'] = new_price
-        tracked_data[symbol]['lowtarget'] = new_lowtarget
-        tracked_data[symbol]['hightarget'] = new_hightarget
-    save_tracked_data()
+        data = tracked_data[symbol]
+        try:
+            price_entries[i].insert(0, data['price'])
+            lowtarget_entries[i].insert(0, data['lowtarget'])
+            hightarget_entries[i].insert(0, data['hightarget'])
+        except IndexError:
+            print(f"Debug: IndexError at {i} for symbol {symbol}")
+
+        # Update color and current price
+        new_color = color(symbol)
+        color_boxes[i].config(bg=new_color)
+        nownow_prices[i].config(text=nowround(symbol))
+
 
 
 class App(tk.Frame):
